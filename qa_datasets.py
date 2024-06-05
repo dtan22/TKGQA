@@ -11,7 +11,7 @@ import torch
 import utils
 from tqdm import tqdm
 from transformers import RobertaTokenizer
-from transformers import DistilBertTokenizer
+from transformers import GPT2Tokenizer, GPT2Model
 from transformers import BertTokenizer
 import random
 from torch.utils.data import Dataset, DataLoader
@@ -37,8 +37,8 @@ class QA_Dataset(Dataset):
         questions = pickle.load(open(filename, 'rb'))
         
         #probably change for bert/roberta?
-        self.tokenizer_class = DistilBertTokenizer 
-        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+        self.tokenizer_class = GPT2Tokenizer
+        self.tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         
         self.all_dicts = utils.getAllDicts(dataset_name)
         print('Total questions = ', len(questions))
