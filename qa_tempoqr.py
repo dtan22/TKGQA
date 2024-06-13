@@ -3,7 +3,7 @@ import torch
 from torch import nn
 import numpy as np
 from tcomplex import TComplEx
-from transformers import GPT2Tokenizer, GPT2Model
+from transformers import GPT2Tokenizer, GPT2Model, DistilBertModel
 from torch.nn import LayerNorm
 
 import pdb
@@ -28,8 +28,8 @@ class QA_TempoQR(nn.Module):
 		self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
 		self.sentence_embedding_dim = 768  # hardwired from 
         
-		self.pretrained_weights = 'gpt2'
-		self.lm_model = GPT2Model.from_pretrained('gpt2')
+		self.pretrained_weights = 'distilbert-base-uncased'
+		self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
 		if args.lm_frozen == 1:
 				print('Freezing LM params')
 				for param in self.lm_model.parameters():
