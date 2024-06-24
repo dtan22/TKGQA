@@ -7,8 +7,8 @@ import pickle
 import numpy as np
 
 from qa_baselines import QA_baseline, QA_lm, QA_embedkgqa, QA_cronkgqa
-from qa_tempoqr import QA_TempoQR
-from qa_datasets import QA_Dataset, QA_Dataset_TempoQR, QA_Dataset_Baseline
+from qa_model import QA_TempoQR, CTRN
+from qa_datasets import QA_Dataset, QA_Dataset_TempoQR, QA_Dataset_Baseline, QA_Dataset_CTRN
 from torch.utils.data import Dataset, DataLoader
 import utils
 from tqdm import tqdm
@@ -24,6 +24,11 @@ parser.add_argument(
     '--tkbc_model_file', default='tcomplex.ckpt', type=str,
     help="Pretrained tkbc model checkpoint"
 )
+
+parser.add_argument('--input_dropout', type=float, default=0.7, help='Input dropout rate.')
+
+parser.add_argument('--gcn_dropout', type=float, default=0.4, help='GCN layer dropout rate.')
+
 parser.add_argument(
     '--tkg_file', default='full.txt', type=str,
     help="TKG to use for hard-supervision"
@@ -358,6 +363,11 @@ elif args.model in ['tempoqr', 'entityqr', 'cronkgqa']:  #supervised models
         dataset = QA_Dataset_TempoQR(split=train_split, dataset_name=args.dataset_name, args=args)
     #valid_dataset = QA_Dataset_TempoQR(split=args.eval_split, dataset_name=args.dataset_name, args=args)
     test_dataset = QA_Dataset_TempoQR(split=test, dataset_name=args.dataset_name, args=args)
+elif args.model in ['ctrn']: 
+    qa_model = CTRN(tkbc_model, args)
+    if args.mode == 'train': 
+        dataset = QA_Dataset_CTRN(split=train_split, dataset_name=args.dataset_name, args=args)
+     test_dataset = QA_Dataset_CTRN(split=test, dataset_name=args.dataset_name, args=args)
 else:
     print('Model %s not implemented!' % args.model)
     exit(0)
