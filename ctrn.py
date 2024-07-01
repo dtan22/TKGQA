@@ -124,10 +124,10 @@ class CTRN(nn.Module):
         self.fuse = args.fuse
         self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
         self.sentence_embedding_dim = 768  # hardwired from
-
+        
         self.pretrained_weights = args.lm_model
 		if args.lm_model=='distilbert-base-uncased':
-			self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
+            self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
 		elif args.lm_model == 'bert-base-multilingual-cased':
 			self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
         if args.lm_frozen == 1:
