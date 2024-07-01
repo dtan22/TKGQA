@@ -11,8 +11,7 @@ import torch
 import utils
 from tqdm import tqdm
 from transformers import RobertaTokenizer
-from transformers import GPT2Tokenizer, GPT2Model
-from transformers import BertTokenizer
+from transformers import DistilBertTokenizer, BertTokenizer, BertModel
 import random
 from torch.utils.data import Dataset, DataLoader
 # from nltk import word_tokenize
