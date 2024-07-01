@@ -26,10 +26,10 @@ from hard_supervision_functions import retrieve_times
 
 class QA_Dataset(Dataset):
     def __init__(self, 
-                split,
-                dataset_name,
-                args,
-                tokenization_needed=True):
+                 args,
+                 split,
+                 dataset_name,
+                 tokenization_needed=True):
         filename = 'data/{dataset_name}/questions/{split}.pickle'.format(
             dataset_name=dataset_name,
             split=split
