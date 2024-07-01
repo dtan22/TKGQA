@@ -367,7 +367,7 @@ elif args.model in ['ctrn']:
     qa_model = CTRN(tkbc_model, args)
     if args.mode == 'train': 
         dataset = QA_Dataset_CTRN(split=train_split, dataset_name=args.dataset_name, args=args)
-     test_dataset = QA_Dataset_CTRN(split=test, dataset_name=args.dataset_name, args=args)
+    test_dataset = QA_Dataset_CTRN(split=test, dataset_name=args.dataset_name, args=args)
 else:
     print('Model %s not implemented!' % args.model)
     exit(0)
