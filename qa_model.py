@@ -32,8 +32,11 @@ class QA_TempoQR(nn.Module):
 		self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
 		self.sentence_embedding_dim = 768  # hardwired from 
         	
-		self.pretrained_weights = 'distilbert-base-uncased'
-		self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
+		self.pretrained_weights = args.lm_model
+		if args.lm_model == 'distilbert-base-uncased':
+        		self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
+		elif args.lm_model == 'bert-base-multilingual-cased':
+			self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
 		if args.lm_frozen == 1:
 				print('Freezing LM params')
 				for param in self.lm_model.parameters():
@@ -288,17 +291,6 @@ class QA_TempoQR(nn.Module):
         
 		return scores  
 
-import torch
-import numpy as np
-import copy
-import math
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn import LayerNorm
-from transformers import DistilBertModel
-from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
-from torch.autograd import Variable
-
 def clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for _ in range(N)])
 
@@ -415,8 +407,11 @@ class CTRN(nn.Module):
         self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
         self.sentence_embedding_dim = 768  # hardwired from
 
-        self.pretrained_weights = 'distilbert-base-uncased'
-        self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
+        self.pretrained_weights = args.lm_model
+	if args.lm_model == 'distilbert-base-uncased':
+        	self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
+	elif args.lm_model == 'bert-base-multilingual-cased':
+		self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
         if args.lm_frozen == 1:
             print('Freezing LM params')
             for param in self.lm_model.parameters():
