@@ -7,7 +7,8 @@ import pickle
 import numpy as np
 
 from qa_baselines import QA_baseline, QA_lm, QA_embedkgqa, QA_cronkgqa
-from qa_model import QA_TempoQR, CTRN
+from tempoqr import QA_TempoQR 
+from ctrn import CTRN
 from qa_datasets import QA_Dataset, QA_Dataset_TempoQR, QA_Dataset_Baseline, QA_Dataset_CTRN
 from torch.utils.data import Dataset, DataLoader
 import utils
