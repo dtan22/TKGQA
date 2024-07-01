@@ -3,11 +3,14 @@ import torch
 from torch import nn
 import numpy as np
 from tcomplex import TComplEx
-from transformers import GPT2Tokenizer, GPT2Model, DistilBertModel
+from transformers import BertModel, DistilBertModel
 from torch.nn import LayerNorm
 import copy
 import torch.nn.functional as F
 import pdb
+from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
+from torch.autograd import Variable
+from torch.nn import LayerNorm
 # training data: questions
 # model:
 # 1. tkbc model embeddings (may or may not be frozen)
@@ -28,7 +31,7 @@ class QA_TempoQR(nn.Module):
 		self.fuse = args.fuse
 		self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
 		self.sentence_embedding_dim = 768  # hardwired from 
-        
+        	
 		self.pretrained_weights = 'distilbert-base-uncased'
 		self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
 		if args.lm_frozen == 1:
