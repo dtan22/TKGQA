@@ -28,6 +28,7 @@ class QA_Dataset(Dataset):
     def __init__(self, 
                 split,
                 dataset_name,
+                args,
                 tokenization_needed=True):
         filename = 'data/{dataset_name}/questions/{split}.pickle'.format(
             dataset_name=dataset_name,
@@ -36,9 +37,12 @@ class QA_Dataset(Dataset):
         questions = pickle.load(open(filename, 'rb'))
         
         #probably change for bert/roberta?
-        self.tokenizer_class = DistilBertTokenizer 
-        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
-        
+        if args.lm_model == 'distilbert-base-uncased':
+            self.tokenizer_class = DistilBertTokenizer 
+            self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+        elif args.lm_model == 'bert-base-multilingual-cased': 
+            self.tokenizer_class = BertTokenizer
+            self.tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
         self.all_dicts = utils.getAllDicts(dataset_name)
         print('Total questions = ', len(questions))
         self.data = questions
