@@ -281,7 +281,7 @@ class QA_Dataset(Dataset):
 
 class QA_Dataset_Baseline(QA_Dataset):
     def __init__(self, split, dataset_name,  tokenization_needed=True):
-        super().__init__(split, dataset_name, tokenization_needed)
+        super().__init__(args, split, dataset_name, tokenization_needed)
         print('Preparing data for split %s' % split)
         # self.data = self.data[:30000]
         # new_data = []
@@ -404,8 +404,8 @@ class QA_Dataset_Baseline(QA_Dataset):
 # replace entity mention tokens
 # rather than add + layernorm
 class QA_Dataset_TempoQR(QA_Dataset):
-    def __init__(self, split, dataset_name, args, tokenization_needed=True):
-        super().__init__(split, dataset_name, tokenization_needed)
+    def __init__(self, args, split, dataset_name, tokenization_needed=True):
+        super().__init__(args, split, dataset_name, tokenization_needed)
         print('Preparing data for split %s' % split)
         ents = self.all_dicts['ent2id'].keys()
         self.all_dicts['tsstr2id'] = {str(k[0]):v for k,v in self.all_dicts['ts2id'].items()}
@@ -691,8 +691,8 @@ class QA_Dataset_TempoQR(QA_Dataset):
         return input_ids, attention_mask, entity_time_ids_padded, entity_mask_padded, heads, tails, times, start_times, end_times, tails2, answers_single
 
 class QA_Dataset_CTRN(QA_Dataset):
-    def __init__(self, split, dataset_name, args, tokenization_needed=True):
-        super().__init__(split, dataset_name, tokenization_needed)
+    def __init__(self, args, split, dataset_name, tokenization_needed=True):
+        super().__init__(args, split, dataset_name, tokenization_needed)
         print('Preparing data for split %s' % split)
         ents = self.all_dicts['ent2id'].keys()
         self.all_dicts['tsstr2id'] = {str(k[0]):v for k,v in self.all_dicts['ts2id'].items()}
