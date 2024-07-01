@@ -130,6 +130,10 @@ parser.add_argument(
     help="Test data."
 )
 
+parser.add_argument(
+    '--lm_model', default="distilbert-base-uncased", type=str,
+    help="For LM models."
+)
 
 
 args = parser.parse_args()
