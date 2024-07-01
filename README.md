@@ -7,8 +7,6 @@ Create a conda environment
 conda create --prefix ./myenv python=3.7
 conda activate ./myenv
 ```
-<!-- Make sure ``python`` and ``pip`` commands point to ``./myenv``. Output of ``which`` should be something like
-```
 
 If this is not the case, try replacing ``python`` with ``python3``. If that works, replace ``python`` with ``python3`` in all commands below.
 
