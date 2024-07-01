@@ -19,7 +19,7 @@ conda install --file requirements.txt -c conda-forge
 
 Download and unzip ``data_v2.zip`` and ``models_ctrn.zip`` in the root directory.
 
-Data: https://drive.usercontent.google.com/download?id=1xHjpkDYlp1JGqJWnefrzdaVGV2_SWksI&authuser=0
+Data: https://drive.usercontent.google.com/download?id=1xHjpkDYlp1JGqJWnefrzdaVGV2_SWksI&authuser=0 \\
 Models: https://drive.google.com/uc?id=14u6snck2DwS5dIh9iG6fekUzS4Wzf8Bc
 ## Running the code
 
