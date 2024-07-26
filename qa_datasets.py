@@ -280,7 +280,7 @@ class QA_Dataset(Dataset):
 
 
 class QA_Dataset_Baseline(QA_Dataset):
-    def __init__(self, split, dataset_name,  tokenization_needed=True):
+    def __init__(self, args, split, dataset_name, tokenization_needed=True):
         super().__init__(args, split, dataset_name, tokenization_needed)
         print('Preparing data for split %s' % split)
         # self.data = self.data[:30000]
