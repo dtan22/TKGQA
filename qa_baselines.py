@@ -7,7 +7,6 @@ from transformers import RobertaModel
 from transformers import BertModel
 from transformers import DistilBertModel
 
-
 import pdb
 # training data: questions
 # model:
@@ -27,12 +26,15 @@ class QA_baseline(nn.Module):
 		self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
 		self.sentence_embedding_dim = 768 # hardwired from roberta
         
-		if args.model =='bert':
+		if args.lm_model =='bert':
 			self.pretrained_weights = 'bert-base-uncased'
 			self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
-		elif args.model =='roberta':
+		elif args.lm_model =='roberta':
 			self.pretrained_weights = 'roberta-base'
 			self.lm_model = RobertaModel.from_pretrained(self.pretrained_weights)
+		elif args.lm_model =='bert-base-multilingual-cased':
+			self.pretrained_weights = 'bert-base-multilingual-cased'
+			self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
 		else:
 			self.pretrained_weights = 'distilbert-base-uncased'
 			self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
