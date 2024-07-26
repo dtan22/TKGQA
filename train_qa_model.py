@@ -359,9 +359,9 @@ elif args.model == 'embedkgqa':
     test_dataset = QA_Dataset_Baseline(split=test, dataset_name=args.dataset_name)
 elif args.model == 'cronkgqa' and args.supervision != 'hard':
     qa_model = QA_cronkgqa(tkbc_model, args)
-    dataset = QA_Dataset_Baseline(split=train_split, dataset_name=args.dataset_name, args=args)
+    dataset = QA_Dataset_TempoQR(split=train_split, dataset_name=args.dataset_name, args=args)
     #valid_dataset = QA_Dataset_baseline(split=args.eval_split, dataset_name=args.dataset_name)
-    test_dataset = QA_Dataset_Baseline(split=test, dataset_name=args.dataset_name, args=args)
+    test_dataset = QA_Dataset_TempoQR(split=test, dataset_name=args.dataset_name, args=args)
 elif args.model in ['tempoqr', 'entityqr', 'cronkgqa']:  #supervised models
     qa_model = QA_TempoQR(tkbc_model, args)
     if args.mode == 'train':
