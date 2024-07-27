@@ -5,7 +5,7 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import LayerNorm
-from transformers import DistilBertModel
+from transformers import DistilBertModel, BertModel
 from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from torch.autograd import Variable
 
