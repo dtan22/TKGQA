@@ -184,12 +184,10 @@ class QA_cronkgqa(QA_baseline):
 		rhs = rhs[:, :self.tkbc_model.rank], rhs[:, self.tkbc_model.rank:]
 		time = time[:, :self.tkbc_model.rank], time[:, self.tkbc_model.rank:]
 
-		return (
-					(lhs[0] * rel[0] * rhs[0] - lhs[1] * rel[1] * rhs[0] -
-					lhs[1] * rel[0] * rhs[1] + lhs[0] * rel[1] * rhs[1]) @ time[0].t() +
-					(lhs[1] * rel[0] * rhs[0] - lhs[0] * rel[1] * rhs[0] +
-					lhs[0] * rel[0] * rhs[1] - lhs[1] * rel[1] * rhs[1]) @ time[1].t()
-		)
+		return ((lhs[0] * rel[0] * rhs[0] - lhs[1] * rel[1] * rhs[0] -
+			lhs[1] * rel[0] * rhs[1] + lhs[0] * rel[1] * rhs[1]) @ time[0].t() +
+			(lhs[1] * rel[0] * rhs[0] - lhs[0] * rel[1] * rhs[0] +
+			lhs[0] * rel[0] * rhs[1] - lhs[1] * rel[1] * rhs[1]) @ time[1].t())
 
 	def score_entity(self, head_embedding, tail_embedding,relation_embedding, time_embedding):
 		lhs = head_embedding[:, :self.tkbc_model.rank], head_embedding[:, self.tkbc_model.rank:]
@@ -206,10 +204,8 @@ class QA_cronkgqa(QA_baseline):
 		rt = rel[0] * time[0], rel[1] * time[0], rel[0] * time[1], rel[1] * time[1]
 		full_rel = rt[0] - rt[3], rt[1] + rt[2]
 
-		return (
-							(lhs[0] * full_rel[0] - lhs[1] * full_rel[1]) @ right[0].t() +
-							(lhs[1] * full_rel[0] + lhs[0] * full_rel[1]) @ right[1].t()
-					)
+		return ((lhs[0] * full_rel[0] - lhs[1] * full_rel[1]) @ right[0].t() +
+			(lhs[1] * full_rel[0] + lhs[0] * full_rel[1]) @ right[1].t())
 
 	def forward(self, a):
 		question_tokenized = a[0].cuda()
