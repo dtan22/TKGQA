@@ -56,7 +56,6 @@ class QA_baseline(nn.Module):
 		#self.entity_time_embedding = nn.Embedding(num_entities + num_times, self.tkbc_embedding_dim)
 		self.entity_time_embedding = nn.Embedding(num_entities + num_times + 1, self.tkbc_embedding_dim, padding_idx=num_entities + num_times)
 		self.entity_time_embedding.weight.data[:-1, :].copy_(full_embed_matrix)
-		self.entity_time_embedding.weight.data.copy_(full_embed_matrix)
 		self.num_entities = num_entities
 		self.num_times = num_times
 
