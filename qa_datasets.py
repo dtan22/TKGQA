@@ -308,108 +308,60 @@ class QA_Dataset_Baseline(QA_Dataset):
     def prepare_data_(self, data):
         # we want to prepare answers lists for each question
         # then at batch prep time, we just stack these
-        # and use scatter
-        heads = []
-        times = []
-        start_times = []
-        end_times = []
-        tails = []
-        tails2 = []
+        # and use scatter 
         question_text = []
-        tokenized_question = []
-        entity_time_ids_tokenized_question = []
-        entity_mask_tokenized_question = []
-        pp_id = 0
+        heads = []
+        tails = []
+        times = []
         num_total_entities = len(self.all_dicts['ent2id'])
         answers_arr = []
-        for question in tqdm(data):
-            # randomly sample pp
-            # in test there is only 1 pp, so always pp_id=0
-            # TODO: this random is causing assertion bug later on
-            # pp_id = random.randint(0, len(question['paraphrases']) - 1)
-            pp_id = 0
-            nl_question = question['paraphrases'][pp_id]
-            q_text = nl_question
-            et_text, et_ids = self.getEntityTimeTextIds(question, pp_id)
+        ent2id = self.all_dicts['ent2id']
+        self.data_ids_filtered=[]
+        # self.data=[]
+        for i,question in enumerate(data):
+            self.data_ids_filtered.append(i)
 
+            # first pp is question text
+            # needs to be changed after making PD dataset
+            # to randomly sample from list
+            q_text = question['paraphrases'][0]
+            
+            
             entities_list_with_locations = self.getEntitiesLocations(question)
             entities_list_with_locations.sort()
-            entities = [id for location, id in
-                        entities_list_with_locations]  # ordering necessary otherwise set->list conversion causes randomness
-            head = entities[0]  # take an entity
+            entities = [id for location, id in entities_list_with_locations] # ordering necessary otherwise set->list conversion causes randomness
+            head = entities[0] # take an entity
             if len(entities) > 1:
                 tail = entities[1]
-                if len(entities) > 2:
-                    tail2 = entities[2]
-                else:
-                    tail2 = tail
             else:
                 tail = entities[0]
-                tail2 = tail
             times_in_question = question['times']
             if len(times_in_question) > 0:
-                time = self.timesToIds(times_in_question)[0]  # take a time. if no time then 0
-                start_time = time
-                end_time = time
+                time = self.timesToIds(times_in_question)[0] # take a time. if no time then 0
                 # exit(0)
             else:
                 time = 0
-                #check for retrieved timestmaps
-                if len(question['fact']) > 0:
-                    ts = []
-                    #add all timestmaps and sort
-                    for f in question['fact']:
-                        for t in range(int(f[0]), int(f[1])+1):
-                            ts.append(t)
-                    ts = sorted(ts)
-                    sorted_times = self.timesToIds(ts)
-                    
-                    try:
-                        start_time = sorted_times[0]   # for random random.choice(sorted_times)
-                    except:
-                        start_time = 0
-                    try:
-                        end_time = sorted_times[-1]
-                    except:
-                        end_time = 0
-                else:
-                    start_time = 0
-                    end_time = 0
-
-                # print('No time in qn!')
-
-
+                
+            
             time += num_total_entities
-
             heads.append(head)
             times.append(time)
-            start_times.append(start_time)
-            end_times.append(end_time)
             tails.append(tail)
-            tails2.append(tail2)
-
-            tokenized, entity_time_final, entity_mask = self.get_entity_aware_tokenization(nl_question, et_text, et_ids)
-            assert len(tokenized) == len(entity_time_final)
-            question_text.append(nl_question)
-            tokenized_question.append(self.tokenizer.convert_tokens_to_ids(tokenized))
-            entity_mask_tokenized_question.append(entity_mask)
-            entity_time_ids_tokenized_question.append(entity_time_final)
+            question_text.append(q_text)
+            
             if question['answer_type'] == 'entity':
                 answers = self.entitiesToIds(question['answers'])
             else:
                 # adding num_total_entities to each time id
                 answers = [x + num_total_entities for x in self.timesToIds(question['answers'])]
             answers_arr.append(answers)
-        return {'question_text': question_text,
-                'tokenized_question': tokenized_question,
-                'entity_time_ids': entity_time_ids_tokenized_question,
-                'entity_mask': entity_mask_tokenized_question,
-                'head': heads,
+            
+        # answers_arr = self.get_stacked_answers_long(answers_arr)
+        self.data=[self.data[idx] for idx in self.data_ids_filtered]
+        return {'question_text': question_text, 
+                'head': heads, 
                 'tail': tails,
                 'time': times,
-                'start_time': start_times,
-                'end_time': end_times,
-                'tail2': tails2,
                 'answers_arr': answers_arr}
     def print_prepared_data(self):
         for k, v in self.prepared_data.items():
