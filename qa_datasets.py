@@ -30,7 +30,7 @@ class QA_Dataset(Dataset):
                  split,
                  dataset_name,
                  tokenization_needed=True):
-        filename = 'data/{dataset_name}/questions/{split}.pickle'.format(
+        filename = 'data/wikidata_big/questions/{split}.pickle'.format(
             dataset_name=dataset_name,
             split=split
         )
