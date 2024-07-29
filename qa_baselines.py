@@ -7,6 +7,7 @@ from transformers import RobertaModel
 from transformers import BertModel
 from transformers import DistilBertModel
 
+
 import pdb
 # training data: questions
 # model:
@@ -26,15 +27,12 @@ class QA_baseline(nn.Module):
 		self.tkbc_embedding_dim = tkbc_model.embeddings[0].weight.shape[1]
 		self.sentence_embedding_dim = 768 # hardwired from roberta
         
-		if args.lm_model =='bert':
+		if args.model =='bert':
 			self.pretrained_weights = 'bert-base-uncased'
 			self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
-		elif args.lm_model =='roberta':
+		elif args.model =='roberta':
 			self.pretrained_weights = 'roberta-base'
 			self.lm_model = RobertaModel.from_pretrained(self.pretrained_weights)
-		elif args.lm_model =='bert-base-multilingual-cased':
-			self.pretrained_weights = 'bert-base-multilingual-cased'
-			self.lm_model = BertModel.from_pretrained(self.pretrained_weights)
 		else:
 			self.pretrained_weights = 'distilbert-base-uncased'
 			self.lm_model = DistilBertModel.from_pretrained(self.pretrained_weights)
@@ -53,9 +51,8 @@ class QA_baseline(nn.Module):
 		ent_emb_matrix = tkbc_model.embeddings[0].weight.data
 		time_emb_matrix = tkbc_model.embeddings[2].weight.data
 		full_embed_matrix = torch.cat([ent_emb_matrix, time_emb_matrix], dim=0)
-		#self.entity_time_embedding = nn.Embedding(num_entities + num_times, self.tkbc_embedding_dim)
-		self.entity_time_embedding = nn.Embedding(num_entities + num_times + 1, self.tkbc_embedding_dim, padding_idx=num_entities + num_times)
-		self.entity_time_embedding.weight.data[:-1, :].copy_(full_embed_matrix)
+		self.entity_time_embedding = nn.Embedding(num_entities + num_times, self.tkbc_embedding_dim)
+		self.entity_time_embedding.weight.data.copy_(full_embed_matrix)
 		self.num_entities = num_entities
 		self.num_times = num_times
 
@@ -185,10 +182,12 @@ class QA_cronkgqa(QA_baseline):
 		rhs = rhs[:, :self.tkbc_model.rank], rhs[:, self.tkbc_model.rank:]
 		time = time[:, :self.tkbc_model.rank], time[:, self.tkbc_model.rank:]
 
-		return ((lhs[0] * rel[0] * rhs[0] - lhs[1] * rel[1] * rhs[0] -
-			lhs[1] * rel[0] * rhs[1] + lhs[0] * rel[1] * rhs[1]) @ time[0].t() +
-			(lhs[1] * rel[0] * rhs[0] - lhs[0] * rel[1] * rhs[0] +
-			lhs[0] * rel[0] * rhs[1] - lhs[1] * rel[1] * rhs[1]) @ time[1].t())
+		return (
+					(lhs[0] * rel[0] * rhs[0] - lhs[1] * rel[1] * rhs[0] -
+					lhs[1] * rel[0] * rhs[1] + lhs[0] * rel[1] * rhs[1]) @ time[0].t() +
+					(lhs[1] * rel[0] * rhs[0] - lhs[0] * rel[1] * rhs[0] +
+					lhs[0] * rel[0] * rhs[1] - lhs[1] * rel[1] * rhs[1]) @ time[1].t()
+		)
 
 	def score_entity(self, head_embedding, tail_embedding,relation_embedding, time_embedding):
 		lhs = head_embedding[:, :self.tkbc_model.rank], head_embedding[:, self.tkbc_model.rank:]
@@ -205,8 +204,10 @@ class QA_cronkgqa(QA_baseline):
 		rt = rel[0] * time[0], rel[1] * time[0], rel[0] * time[1], rel[1] * time[1]
 		full_rel = rt[0] - rt[3], rt[1] + rt[2]
 
-		return ((lhs[0] * full_rel[0] - lhs[1] * full_rel[1]) @ right[0].t() +
-			(lhs[1] * full_rel[0] + lhs[0] * full_rel[1]) @ right[1].t())
+		return (
+							(lhs[0] * full_rel[0] - lhs[1] * full_rel[1]) @ right[0].t() +
+							(lhs[1] * full_rel[0] + lhs[0] * full_rel[1]) @ right[1].t()
+					)
 
 	def forward(self, a):
 		question_tokenized = a[0].cuda()
@@ -231,4 +232,3 @@ class QA_cronkgqa(QA_baseline):
 
 		scores = torch.cat((scores_entity, scores_time), dim=1)
 		return scores
-
