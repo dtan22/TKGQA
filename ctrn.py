@@ -200,7 +200,13 @@ class CTRN(nn.Module):
         self.kg_gate1 = nn.Linear(2 * self.tkbc_embedding_dim, self.tkbc_embedding_dim)
         self.COM = nn.Linear(2 * self.tkbc_embedding_dim, self.tkbc_embedding_dim)
         self.attn = MultiHeadAttention(3, self.sentence_embedding_dim)
+        self.gcn1 = GCN(args, args.sentence_embedding_dim, 2)
+        self.gcn2 = GCN(args, args.sentence_embedding_dim, 2) 
         self.gcn_common = GCN(args, self.sentence_embedding_dim, 2)
+        self.gcn_inc_map = torch.nn.Linear(args.sentence_embedding_dim * 3, args.sentence_embedding_dim)
+        self.inp_map = torch.nn.Linear(args.hidden_dim * 3, args.hidden_dim)
+        self.inp_map1 = torch.nn.Linear(args.hidden_dim * 2, args.hidden_dim)
+        
 
     def invert_binary_tensor(self, tensor):
         ones_tensor = torch.ones(tensor.shape, dtype=torch.float32).cuda()
