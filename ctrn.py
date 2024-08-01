@@ -200,13 +200,7 @@ class CTRN(nn.Module):
         self.kg_gate1 = nn.Linear(2 * self.tkbc_embedding_dim, self.tkbc_embedding_dim)
         self.COM = nn.Linear(2 * self.tkbc_embedding_dim, self.tkbc_embedding_dim)
         self.attn = MultiHeadAttention(3, self.sentence_embedding_dim)
-        self.gcn1 = GCN(args, args.sentence_embedding_dim, 2)
-        self.gcn2 = GCN(args, args.sentence_embedding_dim, 2) 
         self.gcn_common = GCN(args, self.sentence_embedding_dim, 2)
-        self.gcn_inc_map = torch.nn.Linear(args.sentence_embedding_dim * 3, args.sentence_embedding_dim)
-        self.inp_map = torch.nn.Linear(args.hidden_dim * 3, args.hidden_dim)
-        self.inp_map1 = torch.nn.Linear(args.hidden_dim * 2, args.hidden_dim)
-        
 
     def invert_binary_tensor(self, tensor):
         ones_tensor = torch.ones(tensor.shape, dtype=torch.float32).cuda()
@@ -355,18 +349,18 @@ class CTRN(nn.Module):
         n = question_embedding.size(1)
         Convolution = nn.Conv1d(n, n, 3).cuda()
         conve = F.relu(Convolution(h_cse))
-        graph_out = self.linearc(conve)
+        deep_q = self.linearc(conve)
         asp_wn = question_attention_mask.sum(dim=1).unsqueeze(-1)
         mask = question_attention_mask.unsqueeze(-1).repeat(1, 1, 512)
-        graph_enc_outputs = (graph_out * mask).sum(dim=1) / asp_wn
+        h_e = (deep_q * mask).sum(dim=1) / asp_wn
         question_embedding1 = self.project_sentence_to_transformer_dim(question_embedding)
         entity_mask = entity_mask_padded.unsqueeze(-1).expand(question_embedding1.shape)
         entity_time_embedding_projected = self.project_entity(entity_time_embedding)
 
         if self.supervision == 'soft':
             cls = self.linear(cls_embedding)
-            gate_value = self.kg_gate1(torch.cat([graph_enc_outputs, cls], dim=-1)).sigmoid()
-            vq = gate_value * graph_enc_outputs + (1 - gate_value) * cls
+            gate_value = self.kg_gate1(torch.cat([h_e, cls], dim=-1)).sigmoid()
+            vq = gate_value * h_e + (1 - gate_value) * cls
             cls_embedding = self.linearT(vq)
 
             t1_emb = self.infer_time(head_embedding, tail_embedding, cls_embedding)
@@ -414,8 +408,8 @@ class CTRN(nn.Module):
         output = self.transformer_encoder(combined_embed, src_key_padding_mask=mask2)
 
         embedding = output.transpose(1, 0)
-        gate_value = self.kg_gate(torch.cat([embedding, graph_out], dim=-1)).sigmoid()
-        fun_embedding = gate_value * embedding + (1 - gate_value) * graph_out
+        gate_value = self.kg_gate(torch.cat([embedding, deep_q], dim=-1)).sigmoid()
+        fun_embedding = gate_value * embedding + (1 - gate_value) * deep_q
         relation_embedding = fun_embedding.transpose(1, 0)[0]
 
         relation_embedding1 = self.dropout(self.bn1(self.linear1(relation_embedding)))
